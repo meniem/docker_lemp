@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: 'bitnami/nginx'
+    ports:
+      - '8050:8080'
+    links:
+      - phpfpm
+    volumes:
+      - ./nginx/app.conf:/opt/bitnami/nginx/conf/server_blocks/app.conf
+      - ./public:/app
+
+  phpfpm:
+    image: 'bitnami/php-fpm'
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./public:/myapps
+
+  mysql:
+    image: 'mysql:5.7'
+    ports:
+        - '3306:3306'
+    volumes:
+        - ./db-data:/var/lib/mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=password
+
+  phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin'
+    restart: always
+    ports:
+       - '8080:80'
+    links:
+        - mysql:mysql
+    environment:
+        MYSQL_USERNAME: root
+        MYSQL_ROOT_PASSWORD: password
+        PMA_HOST: mysql
